@@ -1,0 +1,20 @@
+---
+dependencies:
+  - geerlingguy.nodejs
+  - geerlingguy.daemonize
+
+galaxy_info:
+  author: GROwen
+  description: Cloud9 for beet/sprintbox.
+  license: "license (BSD, MIT)"
+  min_ansible_version: 1.9
+  platforms:
+  - name: Ubuntu
+    versions:
+    - all
+  categories:
+    - beetbox
+    - development
+    - installer
+    - cloud9
+    - web

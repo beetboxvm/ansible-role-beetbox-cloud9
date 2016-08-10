@@ -1,0 +1,32 @@
+---
+- name: install the latest version of tmux
+  package: name=tmux state=latest
+
+- name: Download c9/core
+  git:
+    repo: "git://github.com/c9/core.git"
+    dest: "{{ workspace }}/c9sdk"
+
+- name: Run cloud9 server
+  shell: >
+    cd {{ workspace }}/c9sdk/scripts && ./install-sdk.sh
+  register: cloud9_installed
+  changed_when: "cloud9 installed"
+
+- name: Add cloud9 to local bin.
+  copy:
+    src: "{{ workspace }}/opt/c9sdk/server.js"
+    dest: "{{ cloud9_bin_path }}"
+    mode: 0755
+
+- name: Copy cloud9 init script into place.
+  template:
+    src: cloud9.init.j2
+    dest: /etc/init.d/cloud9
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Ensure cloud9 is enabled and will start on boot.
+  service: name=cloud9 state=started enabled=yes
+  when: "{{ cloud9_webdriver }}"
