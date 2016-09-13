@@ -2,19 +2,25 @@
 - name: install the latest version of tmux
   package: name=tmux state=latest
 
+- name: Install Forever
+  npm:
+    name: forever
+    global: yes
+
 - name: Download c9/core
   git:
     repo: "git://github.com/c9/core.git"
     dest: "{{ workspace }}/c9sdk"
 
 - name: Run cloud9 server
-  shell: >
-    cd {{ workspace }}/c9sdk/scripts && ./install-sdk.sh
-  register: cloud9_installed
-  changed_when: "cloud9 installed"
+  command: cd {{ workspace }}/c9sdk/scripts && ./install-sdk.sh
+  ignore_errors: True
+    register: cloud9_installed
+    changed_when: "cloud9 installed"
 
 - name: Add cloud9 to local bin.
   copy:
+    ignore_errors: True
     src: "{{ workspace }}/opt/c9sdk/server.js"
     dest: "{{ cloud9_bin_path }}"
     mode: 0755

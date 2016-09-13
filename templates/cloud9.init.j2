@@ -1,7 +1,7 @@
 #! /bin/sh
-# /etc/init.d/cloud9
+# /etc/init.d/shout
 #
-# cloud9 webdriver init script.
+# Cloud9 init script.
 
 ### BEGIN INIT INFO
 # Provides:          cloud9
@@ -9,51 +9,50 @@
 # Required-Stop:     $remote_fs $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: Start cloud9 webdriver at boot time.
-# Description:       Enable cloud9 webdriver.
+# Short-Description: Start Cloud9 at boot time.
+# Description:       Enable Cloud9.
 ### END INIT INFO
 
+PID=/var/run/shout.pid
 PID=/var/run/cloud9.pid
-LOCK=/var/lock/cloud9.lock
 USER=nobody
 BIN="{{ cloud9_bin_path }}"
-PROJECT_ROOT = "{{ beet_root }}"
 PORT="{{ cloud9_webdriver_port }}"
-DAEMONIZE_BIN="/usr/sbin/daemonize"
+FOREVER_BIN="/usr/bin/forever"
 
 # Carry out specific functions when asked to by the system
 case "$1" in
   start)
-    echo "Starting cloud9."
-    $DAEMONIZE_BIN -p $PID -l $LOCK -u $USER $BIN -w $PROJECT_ROOT -p $PORT
+    echo "Starting Cloud9."
+    $FOREVER_BIN --pidFile $PID --uid $USER $BIN start -w $PROJECT_ROOT -p $PORT
     ;;
   stop)
     if [ -f $PID ]; then
-      echo "Stopping cloud9.";
+      echo "Stopping Cloud9.";
       kill -TERM $(cat $PID);
       rm -f $PID;
     else
-      echo "cloud9 is not running.";
+      echo "shout is not running.";
     fi
     ;;
   restart)
-    echo "Restarting cloud9."
+    echo "Restarting Cloud9."
     if [ -f $PID ]; then
       kill -TERM $(cat $PID);
       rm -f $PID;
     fi
-    $DAEMONIZE_BIN -p $PID -l $LOCK -u $USER $BIN
+    $FOREVER_BIN --pidFile $PID --uid $USER $BIN start -w $PROJECT_ROOT -p $PORT
     ;;
   status)
     if [ -f $PID ]; then
-      echo "cloud9 is running.";
+      echo "Cloud9 is running.";
     else
-      echo "cloud9 is not running.";
+      echo "Cloud9 is not running.";
       exit 3
     fi
     ;;
   *)
-    echo "Usage: /etc/init.d/cloud9 {start|stop|status|restart}"
+    echo "Usage: /etc/init.d/shout {start|stop|status|restart}"
     exit 1
     ;;
 esac
