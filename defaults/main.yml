@@ -1,6 +1,5 @@
 ---
 workspace: /opt/
-cloud9_bin_path: /usr/local/bin/server.js
-cloud9_webdriver: no
 cloud9_project_root: "{{ beet_root }}"
-cloud9_webdriver_port: 8181
+cloud9_listen: 0.0.0.0
+cloud9_port: 8181

@@ -9,28 +9,29 @@
 # Required-Stop:     $remote_fs $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: Start Cloud9 at boot time.
-# Description:       Enable Cloud9.
+# Short-Description: Start cloud9 node server at boot time.
+# Description:       Run cloud9 node server.
 ### END INIT INFO
 
-PID=/var/run/shout.pid
+export HOME=/root
+
 PID=/var/run/cloud9.pid
-USER=nobody
-BIN="{{ cloud9_bin_path }}"
-PORT="{{ cloud9_webdriver_port }}"
-FOREVER_BIN="/usr/bin/forever"
+C9_SCRIPT="{{ workspace }}/c9sdk/server.js"
+PROJECT_ROOT="{{ cloud9_project_root }}"
+PORT="{{ cloud9_port }}"
+LISTEN="{{ cloud9_listen }}"
+FOREVER_BIN=/usr/bin/forever
 
 # Carry out specific functions when asked to by the system
 case "$1" in
   start)
-    echo "Starting Cloud9."
-    $FOREVER_BIN --pidFile $PID --uid $USER $BIN start -w $PROJECT_ROOT -p $PORT
+    echo "Starting cloud9."
+    $FOREVER_BIN start -a --pidFile $PID $C9_SCRIPT -p $PORT -l $LISTEN -a : -w $PROJECT_ROOT
     ;;
   stop)
     if [ -f $PID ]; then
-      echo "Stopping Cloud9.";
-      kill -TERM $(cat $PID);
-      rm -f $PID;
+      echo "Stopping cloud9.";
+      $FOREVER_BIN stop $(cat $PID);
     else
       echo "shout is not running.";
     fi
@@ -38,10 +39,9 @@ case "$1" in
   restart)
     echo "Restarting Cloud9."
     if [ -f $PID ]; then
-      kill -TERM $(cat $PID);
-      rm -f $PID;
+      $FOREVER_BIN stop $(cat $PID);
     fi
-    $FOREVER_BIN --pidFile $PID --uid $USER $BIN start -w $PROJECT_ROOT -p $PORT
+    $FOREVER_BIN start -a --pidFile $PID $C9_SCRIPT -p $PORT -l $LISTEN -a : -w $PROJECT_ROOT
     ;;
   status)
     if [ -f $PID ]; then
